@@ -26,7 +26,6 @@ html, body {
 background: #0a0a0a !important;
 background-color: #0a0a0a !important;
 color: #f0f0f0 !important;
--webkit-text-fill-color: #f0f0f0;
 font-family: ‘Space Mono’, monospace;
 min-height: 100vh;
 padding: 20px 16px 40px;
@@ -97,12 +96,6 @@ font-size: 1.1rem;
 outline: none;
 min-height: 50px;
 cursor: text;
-}
-
-.input-fake:empty::before {
-content: attr(data-placeholder);
-color: #555 !important;
--webkit-text-fill-color: #555 !important;
 }
 
 .input-fake:focus {
@@ -281,6 +274,11 @@ color: var(–muted);
 margin-top: 4px;
 letter-spacing: 0.3px;
 }
+
+.color-azul  { color: #2979ff !important; -webkit-text-fill-color: #2979ff !important; }
+.color-rojo  { color: #ff1744 !important; -webkit-text-fill-color: #ff1744 !important; }
+.color-verde { color: #00e676 !important; -webkit-text-fill-color: #00e676 !important; }
+.color-amarillo { color: #ffd600 !important; -webkit-text-fill-color: #ffd600 !important; }
 </style>
 
 </head>
@@ -296,17 +294,17 @@ letter-spacing: 0.3px;
 
   <div class="field">
     <label>Distancia (km)</label>
-    <div class="input-fake" id="km" contenteditable="true" inputmode="decimal" data-placeholder="Ej: 17.5"></div>
+    <div class="input-fake" id="km" contenteditable="true" inputmode="decimal"></div>
   </div>
 
   <div class="field">
     <label>Tarifa ofrecida (CLP$)</label>
-    <div class="input-fake" id="tarifa" contenteditable="true" inputmode="numeric" data-placeholder="Ej: 5050"></div>
+    <div class="input-fake" id="tarifa" contenteditable="true" inputmode="numeric"></div>
   </div>
 
   <div class="field">
     <label>Duración estimada (min)</label>
-    <div class="input-fake" id="duracion" contenteditable="true" inputmode="numeric" data-placeholder="Ej: 18"></div>
+    <div class="input-fake" id="duracion" contenteditable="true" inputmode="numeric"></div>
   </div>
 </div>
 
@@ -362,17 +360,17 @@ letter-spacing: 0.3px;
     <div class="card-title" style="font-size:0.85rem; letter-spacing:1px;">Resumen</div>
     <div class="desglose-row" style="border-bottom: 1px solid var(--border); padding-bottom: 12px;">
       <span style="color:#aaa; font-size:0.82rem;">Tarifa cobrada</span>
-      <span style="font-family:'Syne',sans-serif; font-weight:700; color:var(--green); font-size:1rem;" id="dTarifaResumen"></span>
+      <span class="color-azul" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1rem;" id="dTarifaResumen"></span>
     </div>
     <div class="desglose-row" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; align-items:flex-start;">
       <span style="display:flex; flex-direction:column; gap:3px;">
         <span style="color:#aaa; font-size:0.82rem;">Costo total</span>
         <span id="dCostoTotalLabel" style="font-size:0.68rem; color:#444;"></span>
       </span>
-      <span style="font-family:'Syne',sans-serif; font-weight:700; color:var(--red); font-size:1rem;" id="dCostoTotal"></span>
+      <span class="color-rojo" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1rem;" id="dCostoTotal"></span>
     </div>
     <div style="padding-top: 14px; display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-family:'Arial',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:0.5px; color:var(--green);">GANANCIA REAL</span>
+      <span class="color-verde" style="font-family:'Arial',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:0.5px;">GANANCIA REAL</span>
       <span id="dGanancia" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem;"></span>
     </div>
   </div>
@@ -480,25 +478,35 @@ letter-spacing: 0.3px;
     const litros = (km / 12).toFixed(1);
     document.getElementById('dBencinaLabel').textContent = `(${km} km ÷ 12 km/L = ${litros} L × $1.600)`;
 
+    function setColor(id, hex) {
+      const el = document.getElementById(id);
+      el.style.color = hex;
+      el.style.webkitTextFillColor = hex;
+    }
+
+    const ganColor = tipo === 'bueno' ? 'color-verde' : tipo === 'regular' ? 'color-amarillo' : 'color-rojo';
     const dGan = document.getElementById('dGanancia');
     dGan.textContent = fmt(ganancia);
-    dGan.style.color = tipo === 'bueno' ? 'var(--green)' : tipo === 'regular' ? 'var(--yellow)' : 'var(--red)';
+    dGan.className = ganColor;
 
     document.getElementById('dCostoTotalLabel').textContent = `(${ fmt(bencina)} benc + ${fmt(comision + iva)} indrv)`;
     document.getElementById('dCostoTotal').textContent = '-' + fmt(bencina + comision + iva);
+    setColor('dCostoTotal', '#ff1744');
+    setColor('dTarifaResumen', '#2979ff');
 
+    const kmColor = porKm >= 400 ? '#00e676' : porKm >= 200 ? '#ffd600' : '#ff1744';
     document.getElementById('ePorKm').textContent = fmt(porKm) + '/km';
-    document.getElementById('ePorKm').style.color = porKm >= 400 ? 'var(--green)' : porKm >= 200 ? 'var(--yellow)' : 'var(--red)';
+    setColor('ePorKm', kmColor);
     document.getElementById('ePorKmLabel').textContent = `(${fmt(ganancia)} ÷ ${km} km)`;
 
     const costoBencinaKm = bencina / km;
     document.getElementById('eCostoBencina').textContent = fmt(costoBencinaKm) + '/km';
-    document.getElementById('eCostoBencina').style.color = 'var(--red)';
+    setColor('eCostoBencina', '#ff1744');
     document.getElementById('eCostoBencinaLabel').textContent = `(${fmt(bencina)} ÷ ${km} km)`;
 
     const costoTotalKm = (bencina + comision + iva) / km;
     document.getElementById('eCostoTotal').textContent = fmt(costoTotalKm) + '/km';
-    document.getElementById('eCostoTotal').style.color = 'var(--red)';
+    setColor('eCostoTotal', '#ff1744');
     document.getElementById('eCostoTotalLabel').textContent = `(${fmt(bencina)} + ${fmt(comision + iva)} = ${fmt(bencina + comision + iva)} ÷ ${km} km)`;
 
     if (porHora !== null) {
