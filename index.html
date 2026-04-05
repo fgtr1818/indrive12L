@@ -478,10 +478,9 @@ letter-spacing: 0.3px;
     const litros = (km / 12).toFixed(1);
     document.getElementById('dBencinaLabel').textContent = `(${km} km ÷ 12 km/L = ${litros} L × $1.600)`;
 
-    function setColor(id, hex) {
+    function setColor(id, cls) {
       const el = document.getElementById(id);
-      el.style.color = hex;
-      el.style.webkitTextFillColor = hex;
+      el.className = el.className.replace(/color-\S+/g, '').trim() + ' ' + cls;
     }
 
     const ganColor = tipo === 'bueno' ? 'color-verde' : tipo === 'regular' ? 'color-amarillo' : 'color-rojo';
@@ -491,22 +490,20 @@ letter-spacing: 0.3px;
 
     document.getElementById('dCostoTotalLabel').textContent = `(${ fmt(bencina)} benc + ${fmt(comision + iva)} indrv)`;
     document.getElementById('dCostoTotal').textContent = '-' + fmt(bencina + comision + iva);
-    setColor('dCostoTotal', '#ff1744');
-    setColor('dTarifaResumen', '#2979ff');
 
-    const kmColor = porKm >= 400 ? '#00e676' : porKm >= 200 ? '#ffd600' : '#ff1744';
+    const kmColorCls = porKm >= 400 ? 'color-verde' : porKm >= 200 ? 'color-amarillo' : 'color-rojo';
     document.getElementById('ePorKm').textContent = fmt(porKm) + '/km';
-    setColor('ePorKm', kmColor);
+    setColor('ePorKm', kmColorCls);
     document.getElementById('ePorKmLabel').textContent = `(${fmt(ganancia)} ÷ ${km} km)`;
 
     const costoBencinaKm = bencina / km;
     document.getElementById('eCostoBencina').textContent = fmt(costoBencinaKm) + '/km';
-    setColor('eCostoBencina', '#ff1744');
+    setColor('eCostoBencina', 'color-rojo');
     document.getElementById('eCostoBencinaLabel').textContent = `(${fmt(bencina)} ÷ ${km} km)`;
 
     const costoTotalKm = (bencina + comision + iva) / km;
     document.getElementById('eCostoTotal').textContent = fmt(costoTotalKm) + '/km';
-    setColor('eCostoTotal', '#ff1744');
+    setColor('eCostoTotal', 'color-rojo');
     document.getElementById('eCostoTotalLabel').textContent = `(${fmt(bencina)} + ${fmt(comision + iva)} = ${fmt(bencina + comision + iva)} ÷ ${km} km)`;
 
     if (porHora !== null) {
@@ -520,11 +517,17 @@ letter-spacing: 0.3px;
     const tarifaRecom = Math.ceil(km * 550 / 100) * 100;
 
     if (tipo === 'malo') {
-      consejo = `<strong>Viaje no rentable.</strong> Para cubrir bencina y comisión necesitás cobrar mínimo <strong>${fmt(tarifaMinima)}</strong>. Lo recomendado para ${km} km sería <strong>${fmt(tarifaRecom)}</strong>.`;
+      const sugerencia = tarifaRecom > tarifa
+        ? ` Intentá negociar a <strong>${fmt(tarifaRecom)}</strong>.`
+        : ` Considerá rechazar este viaje.`;
+      consejo = `<strong>Viaje no rentable.</strong> Para cubrir costos necesitás mínimo <strong>${fmt(tarifaMinima)}</strong>.${sugerencia}`;
     } else if (tipo === 'regular') {
-      consejo = `<strong>Viaje borderline.</strong> Cubrís costos pero el margen es bajo. Si tenés bonificación activa o el destino te deja en zona de alta demanda, puede valer la pena. Si no, intentá negociar a <strong>${fmt(tarifaRecom)}</strong>.`;
+      const sugerencia = tarifaRecom > tarifa
+        ? ` Si podés, intentá negociar a <strong>${fmt(tarifaRecom)}</strong>.`
+        : ` Ya estás cobrando una tarifa razonable para esta distancia.`;
+      consejo = `<strong>Viaje borderline.</strong> Cubrís costos pero el margen es bajo. Si tenés bonificación activa o el destino te deja en zona de alta demanda, puede valer la pena.${sugerencia}`;
     } else {
-      consejo = `<strong>¡Buen viaje!</strong> Tu ganancia por km supera tu promedio de marzo ($481/km). Aceptá sin dudar. 🚗`;
+      consejo = `<strong>¡Buen viaje!</strong> Ganancia sólida para esta distancia. Aceptá sin dudar. 🚗`;
     }
 
     document.getElementById('consejoBox').innerHTML = consejo;
