@@ -346,34 +346,30 @@ letter-spacing: 0.3px;
       <span class="label">Bonificación</span>
       <span class="valor pos" id="dBono"></span>
     </div>
-    <div class="desglose-row">
+    <div class="desglose-row" style="border-bottom:none;">
       <span class="label" id="dBencinaLabel">Bencina (12 km/L × $1.600)</span>
       <span class="valor neg" id="dBencina"></span>
     </div>
-    <div class="desglose-row">
-      <span class="label" id="dBencinaLabel">Bencina (12 km/L × $1.600)</span>
-      <span class="valor neg" id="dBencina"></span>
+  </div>
+
+  <!-- Card resumen final -->
+
+  <div class="card">
+    <div class="desglose-row" style="border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+      <span style="color:#aaa; font-size:0.82rem;">Tarifa cobrada</span>
+      <span style="font-family:'Syne',sans-serif; font-weight:700; color:var(--green); font-size:1rem;" id="dTarifaResumen"></span>
     </div>
-
-```
-<!-- Separador y resumen final -->
-<div style="margin: 16px 0 0; border-top: 1px dashed #2a2a2a; padding-top: 14px;">
-  <div class="desglose-row" style="border-bottom: none; padding-bottom: 4px;">
-    <span class="label">Tarifa cobrada</span>
-    <span class="valor neu" id="dTarifaResumen"></span>
-  </div>
-  <div class="desglose-row" style="border-bottom: none; padding-bottom: 0;">
-    <span class="label" id="dCostoTotalLabel">Costo total</span>
-    <span class="valor neg" id="dCostoTotal"></span>
-  </div>
-</div>
-
-<div style="margin-top: 12px; border-top: 2px solid #2a2a2a; padding-top: 14px; display:flex; justify-content:space-between; align-items:center;">
-  <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; letter-spacing:1px;">GANANCIA REAL</span>
-  <span class="valor" id="dGanancia" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem;"></span>
-</div>
-```
-
+    <div class="desglose-row" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; align-items:flex-start;">
+      <span style="display:flex; flex-direction:column; gap:3px;">
+        <span style="color:#aaa; font-size:0.82rem;">Costo total</span>
+        <span id="dCostoTotalLabel" style="font-size:0.68rem; color:#444;"></span>
+      </span>
+      <span style="font-family:'Syne',sans-serif; font-weight:700; color:var(--red); font-size:1rem;" id="dCostoTotal"></span>
+    </div>
+    <div style="padding-top: 14px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; letter-spacing:1px; color:var(--green);">GANANCIA REAL</span>
+      <span id="dGanancia" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem;"></span>
+    </div>
   </div>
 
   <div class="card">
@@ -483,7 +479,7 @@ letter-spacing: 0.3px;
     dGan.textContent = fmt(ganancia);
     dGan.style.color = tipo === 'bueno' ? 'var(--green)' : tipo === 'regular' ? 'var(--yellow)' : 'var(--red)';
 
-    document.getElementById('dCostoTotalLabel').textContent = `Costo total (${fmt(bencina)} benc + ${fmt(comision + iva)} indrv)`;
+    document.getElementById('dCostoTotalLabel').textContent = `(${ fmt(bencina)} benc + ${fmt(comision + iva)} indrv)`;
     document.getElementById('dCostoTotal').textContent = '-' + fmt(bencina + comision + iva);
 
     document.getElementById('ePorKm').textContent = fmt(porKm) + '/km';
