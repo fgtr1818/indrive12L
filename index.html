@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora InDrive</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+:root {
+–bg: #0a0a0a;
+–card: #111111;
+–border: #1e1e1e;
+–green: #00e676;
+–yellow: #ffd600;
+–red: #ff1744;
+–text: #f0f0f0;
+–muted: #555;
+–indrive: #00e676;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+background: #0a0a0a !important;
+background-color: #0a0a0a !important;
+color: #f0f0f0 !important;
+font-family: ‘Space Mono’, monospace;
+min-height: 100vh;
+padding: 20px 16px 40px;
+}
+
+header {
+text-align: center;
+margin-bottom: 32px;
+padding-top: 12px;
+}
+
+header h1 {
+font-family: ‘Syne’, sans-serif;
+font-weight: 800;
+font-size: 1.8rem;
+letter-spacing: -0.5px;
+line-height: 1.1;
+}
+
+header h1 span { color: var(–indrive); }
+
+header p {
+color: var(–muted);
+font-size: 0.72rem;
+margin-top: 6px;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+
+.card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 20px;
+margin-bottom: 16px;
+}
+
+.card-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 0.7rem;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 16px;
+}
+
+.field { margin-bottom: 16px; }
+
+label {
+display: block;
+font-size: 0.7rem;
+color: var(–muted);
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+.input-fake {
+width: 100%;
+background: #181818 !important;
+border: 1px solid #1e1e1e;
+border-radius: 10px;
+padding: 14px 16px;
+color: #f0f0f0 !important;
+-webkit-text-fill-color: #f0f0f0 !important;
+font-family: ‘Space Mono’, monospace;
+font-size: 1.1rem;
+outline: none;
+min-height: 50px;
+cursor: text;
+}
+
+.input-fake:focus {
+border-color: #00e676;
+}
+
+input[type=“number”]:focus {
+border-color: var(–indrive);
+}
+
+.bono-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+}
+
+.bono-btn {
+background: #181818;
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 10px 6px;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+font-size: 0.72rem;
+cursor: pointer;
+transition: all 0.15s;
+text-align: center;
+}
+
+.bono-btn.active {
+border-color: var(–indrive);
+color: var(–indrive);
+background: rgba(0,230,118,0.07);
+}
+
+.bono-btn span {
+display: block;
+font-family: ‘Syne’, sans-serif;
+font-weight: 700;
+font-size: 0.85rem;
+margin-bottom: 2px;
+white-space: nowrap;
+overflow: visible;
+}
+
+.calc-btn {
+width: 100%;
+background: #00e676 !important;
+background-color: #00e676 !important;
+color: #000000 !important;
+-webkit-text-fill-color: #000000 !important;
+border: none;
+border-radius: 12px;
+padding: 16px;
+font-family: ‘Syne’, sans-serif;
+font-weight: 800;
+font-size: 1rem;
+letter-spacing: 1px;
+cursor: pointer;
+transition: opacity 0.2s;
+margin-top: 4px;
+}
+
+.calc-btn:active { opacity: 0.8; }
+
+/* RESULTADO */
+#resultado {
+display: none;
+animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(8px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.veredicto {
+border-radius: 16px;
+padding: 24px 20px;
+text-align: center;
+margin-bottom: 16px;
+border: 2px solid;
+}
+
+.veredicto.bueno { border-color: var(–green); background: rgba(0,230,118,0.06); }
+.veredicto.regular { border-color: var(–yellow); background: rgba(255,214,0,0.06); }
+.veredicto.malo { border-color: var(–red); background: rgba(255,23,68,0.06); }
+
+.veredicto-icon { font-size: 2.5rem; margin-bottom: 8px; }
+
+.veredicto-label {
+font-family: ‘Syne’, sans-serif;
+font-weight: 800;
+font-size: 1.4rem;
+margin-bottom: 4px;
+}
+
+.veredicto.bueno .veredicto-label { color: var(–green); }
+.veredicto.regular .veredicto-label { color: var(–yellow); }
+.veredicto.malo .veredicto-label { color: var(–red); }
+
+.veredicto-sub {
+font-size: 0.72rem;
+color: var(–muted);
+letter-spacing: 1px;
+}
+
+.ganancia-display {
+font-family: ‘Syne’, sans-serif;
+font-weight: 800;
+font-size: 2.2rem;
+margin: 12px 0 4px;
+}
+
+.veredicto.bueno .ganancia-display { color: var(–green); }
+.veredicto.regular .ganancia-display { color: var(–yellow); }
+.veredicto.malo .ganancia-display { color: var(–red); }
+
+.desglose-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px 0;
+border-bottom: 1px solid var(–border);
+font-size: 0.82rem;
+}
+
+.desglose-row:last-child { border-bottom: none; }
+.desglose-row .label { color: var(–muted); }
+.desglose-row .valor { font-weight: 700; }
+.desglose-row .valor.neg { color: var(–red); }
+.desglose-row .valor.pos { color: var(–green); }
+.desglose-row .valor.neu { color: var(–text); }
+
+.consejo {
+background: #181818;
+border-left: 3px solid var(–indrive);
+border-radius: 0 10px 10px 0;
+padding: 14px 16px;
+font-size: 0.78rem;
+line-height: 1.6;
+color: #bbb;
+margin-top: 4px;
+}
+
+.consejo strong { color: var(–indrive); }
+
+.hora-stat {
+display: flex;
+justify-content: space-between;
+background: #161616;
+border: 1px solid #1e1e1e;
+border-radius: 10px;
+padding: 12px 16px;
+margin-top: 10px;
+font-size: 0.8rem;
+}
+
+.hora-stat .h-label { color: var(–muted); }
+.hora-stat .h-valor { font-family: ‘Syne’, sans-serif; font-weight: 700; }
+
+.hora-stat.formula {
+flex-direction: column;
+align-items: stretch;
+}
+
+.hora-stat.formula .h-top {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.hora-stat.formula .h-formula {
+font-size: 0.68rem;
+color: var(–muted);
+margin-top: 4px;
+letter-spacing: 0.3px;
+}
+
+.color-azul  { color: #2979ff !important; -webkit-text-fill-color: #2979ff !important; }
+.color-rojo  { color: #ff1744 !important; -webkit-text-fill-color: #ff1744 !important; }
+.color-verde { color: #00e676 !important; -webkit-text-fill-color: #00e676 !important; }
+.color-amarillo { color: #ffd600 !important; -webkit-text-fill-color: #ffd600 !important; }
+</style>
+
+</head>
+<body>
+
+<header>
+  <h1>Calculadora <span>InDrive</span></h1>
+  <p>¿Conviene aceptar el viaje?</p>
+</header>
+
+<div class="card">
+  <div class="card-title">Datos del viaje</div>
+
+  <div class="field">
+    <label>Distancia (km)</label>
+    <div class="input-fake" id="km" contenteditable="true" inputmode="decimal"></div>
+  </div>
+
+  <div class="field">
+    <label>Tarifa ofrecida (CLP$)</label>
+    <div class="input-fake" id="tarifa" contenteditable="true" inputmode="numeric"></div>
+  </div>
+
+  <div class="field">
+    <label>Duración estimada (min)</label>
+    <div class="input-fake" id="duracion" contenteditable="true" inputmode="numeric"></div>
+  </div>
+</div>
+
+<button class="calc-btn" onclick="calcular()">CALCULAR →</button>
+
+<div id="resultado">
+  <br>
+  <div id="veredictoBox" class="veredicto">
+    <div class="veredicto-icon" id="vIcon"></div>
+    <div class="veredicto-label" id="vLabel"></div>
+    <div class="ganancia-display" id="vGanancia"></div>
+    <div class="veredicto-sub">ganancia neta real</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Desglose</div>
+    <div class="desglose-row">
+      <span class="label">Tarifa cobrada</span>
+      <span class="valor neu" id="dTarifa"></span>
+    </div>
+    <div class="desglose-row">
+      <span class="label">Comisión InDrive (10.6%)</span>
+      <span class="valor neg" id="dComision"></span>
+    </div>
+    <div class="desglose-row">
+      <span class="label">IVA comisión</span>
+      <span class="valor neg" id="dIva"></span>
+    </div>
+    <div class="desglose-row">
+      <span class="label">Total descuento InDrive</span>
+      <span class="valor neg" id="dTotalDescuento"></span>
+    </div>
+    <div class="desglose-row">
+      <span class="label">Ingreso neto InDrive</span>
+      <span class="valor neu" id="dNeto"></span>
+    </div>
+    <div class="desglose-row">
+      <span class="label">Bonificación</span>
+      <span class="valor pos" id="dBono"></span>
+    </div>
+    <div class="desglose-row" style="border-bottom:none; align-items:flex-start;">
+      <span style="display:flex; flex-direction:column; gap:3px;">
+        <span class="label">Bencina</span>
+        <span id="dBencinaLabel" style="font-size:0.68rem; color:#444;"></span>
+      </span>
+      <span class="valor neg" id="dBencina"></span>
+    </div>
+  </div>
+
+  <!-- Card resumen final -->
+
+  <div class="card">
+    <div class="card-title" style="font-size:0.85rem; letter-spacing:1px;">Resumen</div>
+    <div class="desglose-row" style="border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+      <span style="color:#aaa; font-size:0.82rem;">Tarifa cobrada</span>
+      <span class="color-azul" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1rem;" id="dTarifaResumen"></span>
+    </div>
+    <div class="desglose-row" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; align-items:flex-start;">
+      <span style="display:flex; flex-direction:column; gap:3px;">
+        <span style="color:#aaa; font-size:0.82rem;">Costo total</span>
+        <span id="dCostoTotalLabel" style="font-size:0.68rem; color:#444;"></span>
+      </span>
+      <span class="color-rojo" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1rem;" id="dCostoTotal"></span>
+    </div>
+    <div style="padding-top: 14px; display:flex; justify-content:space-between; align-items:center;">
+      <span class="color-verde" style="font-family:'Arial',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:0.5px;">GANANCIA REAL</span>
+      <span id="dGanancia" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem;"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Eficiencia</div>
+    <div class="hora-stat formula">
+      <div class="h-top">
+        <span class="h-label">CLP$/km neto</span>
+        <span class="h-valor" id="ePorKm"></span>
+      </div>
+      <div class="h-formula" id="ePorKmLabel"></div>
+    </div>
+    <div class="hora-stat" id="eHoraRow" style="display:none;">
+      <span class="h-label">CLP$/hora</span>
+      <span class="h-valor" id="ePorHora"></span>
+    </div>
+    <div class="hora-stat formula">
+      <div class="h-top">
+        <span class="h-label">Costo bencina/km</span>
+        <span class="h-valor" id="eCostoBencina"></span>
+      </div>
+      <div class="h-formula" id="eCostoBencinaLabel"></div>
+    </div>
+    <div class="hora-stat formula">
+      <div class="h-top">
+        <span class="h-label">Costo total/km</span>
+        <span class="h-valor" id="eCostoTotal"></span>
+      </div>
+      <div class="h-formula" id="eCostoTotalLabel"></div>
+    </div>
+  </div>
+
+  <div class="consejo" id="consejoBox"></div>
+</div>
+
+<script>
+  let bonoSeleccionado = 0;
+
+  function selectBono(btn) {
+    document.querySelectorAll('.bono-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const val = btn.dataset.bono;
+    if (val === 'custom') {
+      document.getElementById('customBonoField').style.display = 'block';
+      bonoSeleccionado = 'custom';
+    } else {
+      document.getElementById('customBonoField').style.display = 'none';
+      bonoSeleccionado = parseInt(val);
+    }
+  }
+
+  function fmt(n) {
+    return '$' + Math.round(n).toLocaleString('es-CL');
+  }
+
+  function calcular() {
+    const km = parseFloat(document.getElementById('km').innerText);
+    const tarifa = parseFloat(document.getElementById('tarifa').innerText);
+    const duracion = parseFloat(document.getElementById('duracion').innerText);
+
+    if (!km || !tarifa) {
+      alert('Ingresá la distancia y la tarifa');
+      return;
+    }
+
+    let bono = 0;
+
+    // Cálculos
+    const comision = tarifa * 0.106;
+    const iva = comision * 0.19;
+    const neto = tarifa - comision - iva;
+    const bencina = (km / 12) * 1600;
+    const ganancia = neto + bono - bencina;
+    const porKm = ganancia / km;
+    const porHora = duracion > 0 ? (ganancia / duracion) * 60 : null;
+
+    // Veredicto
+    let tipo, icon, label;
+    if (porKm >= 400) {
+      tipo = 'bueno'; icon = '✅'; label = 'CONVIENE';
+    } else if (porKm >= 200) {
+      tipo = 'regular'; icon = '⚠️'; label = 'REGULAR';
+    } else {
+      tipo = 'malo'; icon = '🔴'; label = 'NO CONVIENE';
+    }
+
+    // Render
+    const vBox = document.getElementById('veredictoBox');
+    vBox.className = 'veredicto ' + tipo;
+    document.getElementById('vIcon').textContent = icon;
+    document.getElementById('vLabel').textContent = label;
+    document.getElementById('vGanancia').textContent = fmt(ganancia);
+
+    document.getElementById('dTarifa').textContent = fmt(tarifa);
+    document.getElementById('dTarifaResumen').textContent = fmt(tarifa);
+    document.getElementById('dComision').textContent = '-' + fmt(comision);
+    document.getElementById('dIva').textContent = '-' + fmt(iva);
+    document.getElementById('dTotalDescuento').textContent = '-' + fmt(comision + iva);
+    document.getElementById('dNeto').textContent = fmt(neto);
+    document.getElementById('dBono').textContent = bono > 0 ? '+' + fmt(bono) : '$0';
+    document.getElementById('dBencina').textContent = '-' + fmt(bencina);
+
+    // Etiqueta dinámica con 12 km/L
+    const litros = (km / 12).toFixed(1);
+    document.getElementById('dBencinaLabel').textContent = `(${km} km ÷ 12 km/L = ${litros} L × $1.600)`;
+
+    function setColor(id, cls) {
+      const el = document.getElementById(id);
+      el.className = el.className.replace(/color-\S+/g, '').trim() + ' ' + cls;
+    }
+
+    const ganColor = tipo === 'bueno' ? 'color-verde' : tipo === 'regular' ? 'color-amarillo' : 'color-rojo';
+    const dGan = document.getElementById('dGanancia');
+    dGan.textContent = fmt(ganancia);
+    dGan.className = ganColor;
+
+    document.getElementById('dCostoTotalLabel').textContent = `(${ fmt(bencina)} benc + ${fmt(comision + iva)} indrv)`;
+    document.getElementById('dCostoTotal').textContent = '-' + fmt(bencina + comision + iva);
+
+    const kmColorCls = porKm >= 400 ? 'color-verde' : porKm >= 200 ? 'color-amarillo' : 'color-rojo';
+    document.getElementById('ePorKm').textContent = fmt(porKm) + '/km';
+    setColor('ePorKm', kmColorCls);
+    document.getElementById('ePorKmLabel').textContent = `(${fmt(ganancia)} ÷ ${km} km)`;
+
+    const costoBencinaKm = bencina / km;
+    document.getElementById('eCostoBencina').textContent = fmt(costoBencinaKm) + '/km';
+    setColor('eCostoBencina', 'color-rojo');
+    document.getElementById('eCostoBencinaLabel').textContent = `(${fmt(bencina)} ÷ ${km} km)`;
+
+    const costoTotalKm = (bencina + comision + iva) / km;
+    document.getElementById('eCostoTotal').textContent = fmt(costoTotalKm) + '/km';
+    setColor('eCostoTotal', 'color-rojo');
+    document.getElementById('eCostoTotalLabel').textContent = `(${fmt(bencina)} + ${fmt(comision + iva)} = ${fmt(bencina + comision + iva)} ÷ ${km} km)`;
+
+    if (porHora !== null) {
+      document.getElementById('eHoraRow').style.display = 'flex';
+      document.getElementById('ePorHora').textContent = fmt(porHora) + '/hr';
+    }
+
+    // Consejo
+    let consejo = '';
+    const tarifaMinima = Math.ceil((bencina + 637) / 0.874 / 100) * 100;
+    // Tarifa recomendada escalonada por distancia
+    let precioPorKm;
+    if (km <= 5) precioPorKm = 600;
+    else if (km <= 10) precioPorKm = 500;
+    else if (km <= 20) precioPorKm = 420;
+    else if (km <= 35) precioPorKm = 370;
+    else precioPorKm = 340;
+    const tarifaRecom = Math.ceil(km * precioPorKm / 100) * 100;
+
+    if (tipo === 'malo') {
+      const sugerencia = tarifaRecom > tarifa
+        ? ` Intentá negociar a <strong>${fmt(tarifaRecom)}</strong>.`
+        : ` Considerá rechazar este viaje.`;
+      consejo = `<strong>Viaje no rentable.</strong> Para cubrir costos necesitás mínimo <strong>${fmt(tarifaMinima)}</strong>.${sugerencia}`;
+    } else if (tipo === 'regular') {
+      const sugerencia = tarifaRecom > tarifa
+        ? ` Si podés, intentá negociar a <strong>${fmt(tarifaRecom)}</strong>.`
+        : ` Ya estás cobrando una tarifa razonable para esta distancia.`;
+      consejo = `<strong>Viaje borderline.</strong> Cubrís costos pero el margen es bajo. Si tenés bonificación activa o el destino te deja en zona de alta demanda, puede valer la pena.${sugerencia}`;
+    } else {
+      consejo = `<strong>¡Buen viaje!</strong> Ganancia sólida para esta distancia. Aceptá sin dudar. 🚗`;
+    }
+
+    document.getElementById('consejoBox').innerHTML = consejo;
+
+    // Mostrar resultado
+    const res = document.getElementById('resultado');
+    res.style.display = 'block';
+    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>
